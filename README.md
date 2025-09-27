@@ -125,6 +125,45 @@ The Admin service will be available via <https://localhost:7003>
 
 The API service will be available (direct) via <http://localhost:7001>
 
+### Mock Sirius gateway
+
+For predictable Sirius responses you can run a lightweight mock defined in
+`sirius.yml` and `mock-sirius.nginx`.
+
+Start it on its own:
+
+```
+docker compose -f docker-compose.sirius.yml up -d
+```
+
+or alongside the full stack:
+
+```
+docker compose -f docker-compose.yml -f docker-compose.sirius.yml up -d
+```
+
+Point any client at the gateway container, for example run:
+
+```
+OPG_LPA_PROCESSING_STATUS_ENDPOINT=http://sirius-gateway/lpa-online-tool/lpas/ \
+  docker compose -f docker-compose.yml -f docker-compose.sirius.yml up -d
+```
+
+The `docker-compose.yml` file now honours the `OPG_LPA_PROCESSING_STATUS_ENDPOINT`
+environment variable (falling back to `http://host.docker.internal:4343/v1/`),
+so you can export it once or add it to a local `.env` file.
+You can query it directly with:
+
+```
+curl -s http://localhost:7010/api/public/v1/lpas/700000000098/scans | jq
+```
+
+Stop the mock with `docker compose -f docker-compose.sirius.yml down` when
+finished.
+
+The root `Makefile` also provides shortcuts: `make sirius-mock-up` and
+`make sirius-mock-down`.
+
 ### Tests
 
 To run the unit tests for the PHP applications:

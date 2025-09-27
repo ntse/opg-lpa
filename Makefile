@@ -182,6 +182,14 @@ reset-api:
 dc-down:
 	@docker compose down --remove-orphans
 
+.PHONY: sirius-mock-up
+sirius-mock-up:
+	@docker compose -f docker-compose.sirius.yml up -d
+
+.PHONY: sirius-mock-down
+sirius-mock-down:
+	@docker compose -f docker-compose.sirius.yml down
+
 .PHONY: dc-front-unit-tests
 dc-front-unit-tests:
 	@docker compose run front-app /app/vendor/bin/phpunit
