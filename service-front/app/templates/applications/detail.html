@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block main %}
+{% set document = application.document or {} %}
+{% set instruction_text = document.instruction if document.instruction is string else '' %}
+{% if instruction_text is boolean %}{% set instruction_text = '' %}{% endif %}
+{% set preference_text = document.preference if document.preference is string else '' %}
+{% if preference_text is boolean %}{% set preference_text = '' %}{% endif %}
+{% set repeat_case_number = application.repeatCaseNumber %}
+{% set certificate_provider = document.certificateProvider or {} %}
+{% set payment = application.payment or {} %}
+{% set payment_amount = payment.amount if payment.amount is defined else None %}
+{% if payment_amount is not none %}
+    {% set payment_amount_display = (payment_amount / 100) %}
+{% else %}
+    {% set payment_amount_display = '' %}
+{% endif %}
+{% set pdf_statuses = pdf_statuses or {} %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">Application {{ application.id }}</h1>
+
+            {% if success %}
+                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="success-title">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="success-title">Success</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-body">{{ success }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+                    <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                    <div class="govuk-error-summary__body">
+                        <p>{{ error }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <dl class="govuk-summary-list">
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Reference</dt>
+                    <dd class="govuk-summary-list__value">LPA-{{ application.id }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Last updated</dt>
+                    <dd class="govuk-summary-list__value">{{ application.updatedAt or "Not yet saved" }}</dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Status</dt>
+                    <dd class="govuk-summary-list__value">{% if application.locked %}Locked{% else %}In progress{% endif %}</dd>
+                </div>
+            </dl>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">Application type</h2>
+            <form method="post" action="/applications/{{ application.id }}/type">
+                {% set current_type = document.type or '' %}
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">What type of LPA is this?</legend>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="type-property" name="lpa_type" type="radio" value="property-and-financial" {% if current_type == 'property-and-financial' %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="type-property">Property and financial affairs</label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="type-health" name="lpa_type" type="radio" value="health-and-welfare" {% if current_type == 'health-and-welfare' %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="type-health">Health and welfare</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save type</button>
+            </form>
+
+            <h2 class="govuk-heading-m govuk-!-margin-top-9">Repeat case number</h2>
+            <form method="post" action="/applications/{{ application.id }}/repeat-case-number" novalidate>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="repeat_case_number">If this is a repeat application, enter the original case number (optional)</label>
+                    <input class="govuk-input govuk-input--width-10" id="repeat_case_number" name="repeat_case_number" type="text" value="{{ repeat_case_number or '' }}">
+                    <span class="govuk-hint">Leave blank and save to remove the number.</span>
+                </div>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save repeat case number</button>
+            </form>
+
+            <h2 class="govuk-heading-m govuk-!-margin-top-9">Who is registering this application?</h2>
+            <form method="post" action="/applications/{{ application.id }}/registering">
+                <div class="govuk-form-group">
+                    {% set registering = document.whoIsRegistering or '' %}
+                    <label class="govuk-label" for="who_is_registering">Select the person registering the LPA</label>
+                    <select class="govuk-select" id="who_is_registering" name="who_is_registering">
+                        <option value="">Choose an option</option>
+                        <option value="donor" {% if registering == 'donor' %}selected{% endif %}>The donor</option>
+                        <option value="attorney" {% if registering == 'attorney' %}selected{% endif %}>An attorney</option>
+                        <option value="other" {% if registering == 'other' %}selected{% endif %}>Someone else</option>
+                    </select>
+                </div>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save registration details</button>
+            </form>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">Donor details</h2>
+            {% set donor = document.donor or {} %}
+            <form method="post" action="/applications/{{ application.id }}/donor" novalidate>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="firstname">First name</label>
+                    <input class="govuk-input" id="firstname" name="firstname" type="text" value="{{ donor.firstname or '' }}">
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="lastname">Last name</label>
+                    <input class="govuk-input" id="lastname" name="lastname" type="text" value="{{ donor.lastname or '' }}">
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="email">Email address</label>
+                    <input class="govuk-input" id="email" name="email" type="email" value="{{ donor.email or '' }}">
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="phone">Phone number</label>
+                    <input class="govuk-input" id="phone" name="phone" type="text" value="{{ donor.phone or '' }}">
+                </div>
+                {% set address = donor.address or {} %}
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Address</legend>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="address_line1">Address line 1</label>
+                        <input class="govuk-input" id="address_line1" name="address_line1" type="text" value="{{ address.line1 or '' }}">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="address_line2">Address line 2</label>
+                        <input class="govuk-input" id="address_line2" name="address_line2" type="text" value="{{ address.line2 or '' }}">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="address_town">Town or city</label>
+                        <input class="govuk-input" id="address_town" name="address_town" type="text" value="{{ address.town or '' }}">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="address_postcode">Postcode</label>
+                        <input class="govuk-input govuk-input--width-10" id="address_postcode" name="address_postcode" type="text" value="{{ address.postcode or '' }}">
+                    </div>
+                </fieldset>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save donor details</button>
+            </form>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">Certificate provider</h2>
+            <p class="govuk-body">Tell us who will confirm that the donor understands the LPA.</p>
+            <form method="post" action="/applications/{{ application.id }}/certificate-provider" novalidate>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="cp_name">Full name</label>
+                    <input class="govuk-input" id="cp_name" name="cp_name" type="text" value="{{ certificate_provider.name or '' }}">
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="cp_email">Email address (optional)</label>
+                    <input class="govuk-input" id="cp_email" name="cp_email" type="email" value="{{ certificate_provider.email or '' }}">
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="cp_phone">Phone number (optional)</label>
+                    <input class="govuk-input" id="cp_phone" name="cp_phone" type="text" value="{{ certificate_provider.phone or '' }}">
+                </div>
+                {% set cp_address = certificate_provider.address or {} %}
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Address (optional)</legend>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="cp_address_line1">Address line 1</label>
+                        <input class="govuk-input" id="cp_address_line1" name="cp_address_line1" type="text" value="{{ cp_address.line1 or '' }}">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="cp_address_line2">Address line 2</label>
+                        <input class="govuk-input" id="cp_address_line2" name="cp_address_line2" type="text" value="{{ cp_address.line2 or '' }}">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="cp_address_town">Town or city</label>
+                        <input class="govuk-input" id="cp_address_town" name="cp_address_town" type="text" value="{{ cp_address.town or '' }}">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="cp_address_postcode">Postcode</label>
+                        <input class="govuk-input govuk-input--width-10" id="cp_address_postcode" name="cp_address_postcode" type="text" value="{{ cp_address.postcode or '' }}">
+                    </div>
+                </fieldset>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save certificate provider</button>
+                <p class="govuk-body"><span class="govuk-hint">Leave everything blank and save to remove the certificate provider.</span></p>
+            </form>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">Primary attorneys</h2>
+            {% set primary_attorneys = document.primaryAttorneys or [] %}
+            {% if primary_attorneys %}
+                <ul class="govuk-list govuk-list--bullet">
+                    {% for attorney in primary_attorneys %}
+                        <li>
+                            <div class="govuk-grid-row govuk-!-margin-bottom-2">
+                                <div class="govuk-grid-column-three-quarters">
+                                    <strong>{{ attorney.name or 'Attorney ' ~ attorney.id }}</strong>
+                                    {% if attorney.email %}<br><span class="govuk-hint">{{ attorney.email }}</span>{% endif %}
+                                    {% if attorney.type %}<br><span class="govuk-hint">Type: {{ attorney.type }}</span>{% endif %}
+                                </div>
+                                <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+                                    <form method="post" action="/applications/{{ application.id }}/primary-attorneys/{{ attorney.id }}/delete">
+                                        <button class="govuk-link govuk-link--no-visited-state" type="submit">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="govuk-body">No primary attorneys added yet.</p>
+            {% endif %}
+
+            <div class="govuk-inset-text">
+                <h3 class="govuk-heading-s">Add a primary attorney</h3>
+                <form method="post" action="/applications/{{ application.id }}/primary-attorneys" novalidate>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="attorney_name">Full name</label>
+                        <input class="govuk-input" id="attorney_name" name="attorney_name" type="text">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="attorney_email">Email address (optional)</label>
+                        <input class="govuk-input" id="attorney_email" name="attorney_email" type="email">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="attorney_type">Type</label>
+                        <select class="govuk-select" id="attorney_type" name="attorney_type">
+                            <option value="human">Individual</option>
+                            <option value="trust">Trust corporation</option>
+                        </select>
+                    </div>
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Add attorney</button>
+                </form>
+            </div>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">People to notify</h2>
+            {% set notify = document.peopleToNotify or [] %}
+            {% if notify %}
+                <ul class="govuk-list govuk-list--bullet">
+                    {% for person in notify %}
+                        <li>
+                            <div class="govuk-grid-row govuk-!-margin-bottom-2">
+                                <div class="govuk-grid-column-three-quarters">
+                                    <strong>{{ person.name or 'Person ' ~ person.id }}</strong>
+                                    {% if person.email %}<br><span class="govuk-hint">{{ person.email }}</span>{% endif %}
+                                    {% if person.relationship %}<br><span class="govuk-hint">Relationship: {{ person.relationship }}</span>{% endif %}
+                                </div>
+                                <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+                                    <form method="post" action="/applications/{{ application.id }}/notified-people/{{ person.id }}/delete">
+                                        <button class="govuk-link govuk-link--no-visited-state" type="submit">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="govuk-body">No people to notify have been added yet.</p>
+            {% endif %}
+
+            <div class="govuk-inset-text">
+                <h3 class="govuk-heading-s">Add someone to notify</h3>
+                <form method="post" action="/applications/{{ application.id }}/notified-people" novalidate>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="notify_name">Full name</label>
+                        <input class="govuk-input" id="notify_name" name="notify_name" type="text">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="notify_email">Email address (optional)</label>
+                        <input class="govuk-input" id="notify_email" name="notify_email" type="email">
+                    </div>
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="notify_relationship">Relationship (optional)</label>
+                        <input class="govuk-input" id="notify_relationship" name="notify_relationship" type="text">
+                    </div>
+                    <button class="govuk-button" data-module="govuk-button" type="submit">Add person</button>
+                </form>
+            </div>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">Instructions</h2>
+            <form method="post" action="/applications/{{ application.id }}/instruction" novalidate>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="instruction">Tell us about any instructions (optional)</label>
+                    <textarea class="govuk-textarea" id="instruction" name="instruction" rows="5">{{ instruction_text }}</textarea>
+                </div>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save instructions</button>
+            </form>
+
+            <h2 class="govuk-heading-m govuk-!-margin-top-9">Preferences</h2>
+            <form method="post" action="/applications/{{ application.id }}/preference" novalidate>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="preference">Add preferences (optional)</label>
+                    <textarea class="govuk-textarea" id="preference" name="preference" rows="5">{{ preference_text }}</textarea>
+                </div>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save preferences</button>
+            </form>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">Payment details</h2>
+            <form method="post" action="/applications/{{ application.id }}/payment" novalidate>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="payment_method">Method</label>
+                    {% set payment_method = payment.method if payment.method is defined else '' %}
+                    <select class="govuk-select" id="payment_method" name="payment_method">
+                        <option value="">Choose an option</option>
+                        <option value="card" {% if payment_method == 'card' %}selected{% endif %}>Card payment</option>
+                        <option value="cheque" {% if payment_method == 'cheque' %}selected{% endif %}>Cheque</option>
+                        <option value="payment-exemption" {% if payment_method == 'payment-exemption' %}selected{% endif %}>Fee exemption</option>
+                        <option value="payment-reduction" {% if payment_method == 'payment-reduction' %}selected{% endif %}>Fee reduction</option>
+                    </select>
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="payment_amount">Amount (in pounds)</label>
+                    <input class="govuk-input govuk-input--width-10" id="payment_amount" name="payment_amount" type="text" value="{{ payment_amount_display }}">
+                    <span class="govuk-hint">For example, 82 or 82.50. Leave blank to clear the amount.</span>
+                </div>
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="payment_reference">Reference (optional)</label>
+                    <input class="govuk-input" id="payment_reference" name="payment_reference" type="text" value="{{ payment.reference if payment.reference is defined else '' }}">
+                </div>
+                <button class="govuk-button" data-module="govuk-button" type="submit">Save payment details</button>
+            </form>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">PDF generation status</h2>
+            <p class="govuk-body">We request PDFs as you progress through the application. This table shows their current status.</p>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Document</th>
+                        <th scope="col" class="govuk-table__header">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    {% for code, info in pdf_statuses.items() %}
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">{{ code.upper() }}</th>
+                            <td class="govuk-table__cell">
+                                {% if info.detail %}
+                                    {{ info.status | default('unknown') }} – <span class="govuk-hint">{{ info.detail }}</span>
+                                {% else %}
+                                    {{ info.status | default('unknown') }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+            <h2 class="govuk-heading-m">Lock this application</h2>
+            {% if application.locked %}
+                <p class="govuk-body">This application is locked. No further changes can be made.</p>
+            {% else %}
+                <p class="govuk-body">Lock the application once everything is complete.</p>
+                <form method="post" action="/applications/{{ application.id }}/lock">
+                    <button class="govuk-button govuk-button--secondary" data-module="govuk-button" type="submit">Lock application</button>
+                </form>
+            {% endif %}
+
+            <p class="govuk-body govuk-!-margin-top-9"><a class="govuk-link" href="/dashboard">Back to your applications</a></p>
+        </div>
+    </div>
+{% endblock %}

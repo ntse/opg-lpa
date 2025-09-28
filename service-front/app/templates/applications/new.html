@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block main %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">{{ title }}</h1>
+            <p class="govuk-body">Answer a few quick questions to get your application started.</p>
+
+            {% if errors.get('__all__') %}
+                <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+                    <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                    <div class="govuk-error-summary__body">
+                        <p>{{ errors['__all__'] }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="who-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Who are you?</legend>
+                        <span class="govuk-hint" id="who-hint">This helps us tailor the questions to you.</span>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            {% set who = form.get('who_are_you', '') %}
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="who-donor" name="who_are_you" type="radio" value="donor" {% if who == 'donor' %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="who-donor">I am the donor</label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="who-attorney" name="who_are_you" type="radio" value="attorney" {% if who == 'attorney' %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="who-attorney">I am an attorney</label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="who-other" name="who_are_you" type="radio" value="other" {% if who == 'other' %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="who-other">Someone else</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="who_is_registering">Who is registering the application?</label>
+                    <select class="govuk-select" id="who_is_registering" name="who_is_registering">
+                        {% set registering = form.get('who_is_registering', '') %}
+                        <option value="">Choose an option</option>
+                        <option value="donor" {% if registering == 'donor' %}selected{% endif %}>The donor</option>
+                        <option value="attorney" {% if registering == 'attorney' %}selected{% endif %}>An attorney</option>
+                        <option value="other" {% if registering == 'other' %}selected{% endif %}>Someone else</option>
+                    </select>
+                </div>
+
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset" aria-describedby="type-hint">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">What type of LPA do you need?</legend>
+                        <span class="govuk-hint" id="type-hint">You can change this later.</span>
+                        {% set chosen_type = form.get('application_type', '') %}
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="type-property" name="application_type" type="radio" value="property-and-financial" {% if chosen_type == 'property-and-financial' %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="type-property">Property and financial affairs</label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="type-health" name="application_type" type="radio" value="health-and-welfare" {% if chosen_type == 'health-and-welfare' %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="type-health">Health and welfare</label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <button class="govuk-button" data-module="govuk-button" type="submit">Create application</button>
+                <p class="govuk-body"><a class="govuk-link" href="/dashboard">Cancel and go back</a></p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -7,6 +7,7 @@ from app.core.database import get_db_session
 from app.services import (
     ApplicationsService,
     AuthenticationService,
+    CertificateProviderService,
     CorrespondentService,
     DeletionLogRepository,
     DonorService,
@@ -21,6 +22,7 @@ from app.services import (
     RepeatCaseNumberService,
     PrimaryAttorneyService,
     ReplacementAttorneyService,
+    TypeService,
     UsersService,
     WhoAreYouService,
     WhoIsRegisteringService,

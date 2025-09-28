@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block main %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">{{ title }}</h1>
+
+            {% if success %}
+                <div class="govuk-notification-banner govuk-notification-banner--success" role="region" aria-labelledby="success-title">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="success-title">Success</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-body">{{ success }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+                    <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                    <div class="govuk-error-summary__body">
+                        <p>{{ error }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <p class="govuk-body">Start a new application or continue with ones you have already begun.</p>
+
+            <div class="govuk-button-group">
+                <a class="govuk-button govuk-button--start" data-module="govuk-button" href="/applications/new">Start a new application</a>
+            </div>
+
+            {% if applications %}
+                <table class="govuk-table govuk-!-margin-top-6">
+                    <caption class="govuk-table__caption govuk-table__caption--m">Your applications ({{ total }})</caption>
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">Reference</th>
+                            <th scope="col" class="govuk-table__header">Type</th>
+                            <th scope="col" class="govuk-table__header">Last updated</th>
+                            <th scope="col" class="govuk-table__header">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        {% for application in applications %}
+                            {% set document = application.document or {} %}
+                            {% set app_type = document.type or '' %}
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">
+                                    <a class="govuk-link" href="/applications/{{ application.id }}">LPA-{{ application.id }}</a>
+                                </td>
+                                <td class="govuk-table__cell">
+                                    {% if app_type %}
+                                        {{ app_type.replace('-', ' ').title() }}
+                                    {% else %}
+                                        <span class="govuk-hint">Not set</span>
+                                    {% endif %}
+                                </td>
+                                <td class="govuk-table__cell">{{ application.updatedAt or "Not yet saved" }}</td>
+                                <td class="govuk-table__cell">{% if application.locked %}Locked{% else %}In progress{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="govuk-body">You have not started any applications yet.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

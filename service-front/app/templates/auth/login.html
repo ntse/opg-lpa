@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block main %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">{{ title }}</h1>
+            {% if errors.get('__all__') %}
+                <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+                    <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                    <div class="govuk-error-summary__body">
+                        <p>{{ errors['__all__'] }}</p>
+                    </div>
+                </div>
+            {% endif %}
+            <form method="post" novalidate>
+                <div class="govuk-form-group{% if errors.get('email') %} govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="email">Email address</label>
+                    {% if errors.get('email') %}
+                        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors['email'] }}</p>
+                    {% endif %}
+                    <input class="govuk-input" id="email" name="email" type="email" value="{{ form.get('email', '') }}" autocomplete="email">
+                </div>
+
+                <div class="govuk-form-group{% if errors.get('password') %} govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="password">Password</label>
+                    {% if errors.get('password') %}
+                        <p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors['password'] }}</p>
+                    {% endif %}
+                    <input class="govuk-input" id="password" name="password" type="password" autocomplete="current-password">
+                </div>
+
+                <button class="govuk-button" data-module="govuk-button" type="submit">Sign in</button>
+            </form>
+            <p class="govuk-body">Need an account? <a class="govuk-link" href="{{ url_for('register') }}">Create one</a>.</p>
+        </div>
+    </div>
+{% endblock %}

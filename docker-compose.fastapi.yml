@@ -1,0 +1,77 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: lpa
+      POSTGRES_USER: lpa
+      POSTGRES_PASSWORD: lpa
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lpa -d lpa"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  service-api:
+    build:
+      context: ./service-api
+      dockerfile: docker/Dockerfile
+    environment:
+      OPG_LPA_DB_URL: postgresql+psycopg_async://lpa:lpa@db:5432/lpa
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8001"
+      - --reload
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -fsS http://localhost:8001/healthz || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 10
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./service-api/app:/app/app
+      - ./service-api/tests:/app/tests
+
+  service-front:
+    build:
+      context: ./service-front
+      dockerfile: docker/Dockerfile
+    environment:
+      OPG_LPA_API_BASE_URL: http://service-api:8001
+      OPG_LPA_SESSION_SECRET_KEY: super-secret-session-key-1234
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+    # depends_on:
+    #   service-api:
+    #     condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz || exit 1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 10
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./service-front/app:/app/app
+      - ./service-front/content:/app/content
+      - ./service-front/public:/app/public
+
+volumes:
+  pg_data:

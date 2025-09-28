@@ -5,6 +5,20 @@ The Office of the Public Guardian Lasting Power of Attorney online service: Mana
 [![repo standards badge](https://img.shields.io/badge/dynamic/json?color%3Dblue&style=for-the-badge&logo=github&label=MoJ+Compliant&query=%24.result&url=https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/api/v1/compliant_public_repositories/opg-lpa
 )](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#opg-lpa "Link to report")
 
+## FastAPI stack quick start
+
+The modernised FastAPI front end and API can be started locally with Docker:
+
+```
+docker compose -f docker-compose.fastapi.yml up --build
+```
+
+Once the containers are running:
+
+- Front end: http://localhost:8000 (use "Create an account" to register, activate, and sign in).
+- API: http://localhost:8001 (FastAPI docs available at `/docs`).
+- Postgres: localhost:54320 (`lpa`/`lpa`).
+
 ## Pre-requisites for Local Development
 
 Set up software on your machine required to run the application locally:
@@ -269,6 +283,18 @@ The package.json in the root of the repo has all of the required dev dependancie
 ```bash
 npm i <package-name> --saveDev
 ```
+
+### Playwright smoke checks
+
+Lightweight health check coverage is provided via Playwright in `playwright/tests`.
+Ensure dependencies are installed (`npm install`) and run the suite with:
+
+```bash
+npm run test:playwright
+```
+
+By default the tests target `http://localhost:8000`; override this by setting
+`PLAYWRIGHT_BASE_URL` when invoking the script.
 
 ### The S3 monitor
 

@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class DatabaseSettings(BaseModel):
     url: str = Field(
-        default="postgresql+psycopg_async://lpauser:lpapass@localhost:5432/lpadb",
+        default="postgresql+psycopg_async://lpa:lpa@db:5432/lpa",
         description="SQLAlchemy database URL",
     )
     pool_size: int = 10

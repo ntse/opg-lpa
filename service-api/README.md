@@ -25,6 +25,16 @@ service-api/
 - Access to the Postgres instance that backs the service (same schema as the legacy PHP implementation)
 - Optional: Docker / docker-compose if you want to run the wider stack locally
 
+## Docker Compose
+
+The FastAPI stack ships with a development compose file at the repository root. To run the API, front end, and Postgres together use:
+
+```
+docker compose -f ../docker-compose.fastapi.yml up --build
+```
+
+Within the stack the API listens on http://service-api:8001 (exposed locally on http://localhost:8001).
+
 ## Getting started
 
 Create a virtual environment and install dependencies (the Makefile uses [`uv`](https://github.com/astral-sh/uv) to download Python 3.13 automatically if it is not already installed):

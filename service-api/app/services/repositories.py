@@ -415,7 +415,7 @@ class ApplicationRepository:
             id=application_id,
             user=user_id,
             document=document,
-            metadata=metadata,
+            metadata_json=metadata,
             payment=payment,
             repeatCaseNumber=repeat_case_number,
             startedAt=started_at,
@@ -497,23 +497,23 @@ class ApplicationRepository:
         who_are_you_answered: bool | None = None,
         updated_at: datetime | None = None,
     ) -> bool:
-        values: dict[str, Any] = {}
+        values: dict[Any, Any] = {}
         if document is not None:
-            values["document"] = document
+            values[Application.document] = document
         if metadata is not None:
-            values["metadata"] = metadata
+            values[Application.metadata_json] = metadata
         if payment is not None:
-            values["payment"] = payment
+            values[Application.payment] = payment
         if repeat_case_number is not None:
-            values["repeatCaseNumber"] = repeat_case_number
+            values[Application.repeat_case_number] = repeat_case_number
         if locked is not None:
-            values["locked"] = locked
+            values[Application.locked] = locked
         if locked_at is not None:
-            values["lockedAt"] = locked_at
+            values[Application.locked_at] = locked_at
         if who_are_you_answered is not None:
-            values["whoAreYouAnswered"] = who_are_you_answered
+            values[Application.who_are_you_answered] = who_are_you_answered
         if updated_at is not None:
-            values["updatedAt"] = updated_at
+            values[Application.updated_at] = updated_at
 
         if not values:
             return False
@@ -521,7 +521,7 @@ class ApplicationRepository:
         stmt = (
             update(Application)
             .where(and_(Application.id == application_id, Application.user_id == user_id))
-            .values(**values)
+            .values(values)
         )
         result = await self.session.execute(stmt)
         return result.rowcount == 1

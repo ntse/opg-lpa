@@ -1,0 +1,109 @@
+{% set default_title = 'Make a lasting power of attorney' %}
+{% set page_title = title or default_title %}
+<!DOCTYPE html>
+<html lang="en" class="govuk-template govuk-template--rebranded">
+<head>
+    <meta charset="utf-8">
+    <title>{{ page_title }} - GOV.UK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Make a lasting power of attorney">
+    <link rel="stylesheet" href="{{ url_for('static', path='v2/css/govuk-template.min.css') }}">
+    <link rel="stylesheet" media="print" href="{{ url_for('static', path='v2/css/govuk-template-print.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='v2/css/fonts.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='v2/css/govuk-frontend.min.css') }}">
+    <link rel="stylesheet" media="print" href="{{ url_for('static', path='v2/css/print.min.css') }}">
+    <link rel="icon" href="{{ url_for('static', path='v2/images/favicon.ico') }}" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='v2/images/apple-touch-icon-144x144.png') }}">
+    <style>
+        body { background-color: #f3f2f1; }
+        .text { max-width: 40em; }
+        .text .lede { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; }
+        #home-boxes { display: flex; flex-wrap: wrap; margin: 2rem 0; gap: 1.5rem; }
+        #home-boxes-left, #home-boxes-right { flex: 1 1 320px; }
+        #home-boxes .button { display: inline-block; margin-top: 1rem; }
+        .button { font-weight: 700; font-size: 1rem; background-color: #1d70b8; border: none; padding: 0.75rem 1.5rem; color: #fff; text-decoration: none; border-radius: 5px; }
+        .button:hover, .button:focus { background-color: #003078; color: #fff; }
+        .button-start { position: relative; padding-right: 2.5rem; }
+        .button-start:after { content: '\203A'; font-size: 1.5rem; position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); }
+        .govuk-service-navigation { background: #1d70b8; color: #fff; padding: 0.5rem 0; margin-bottom: 1.5rem; }
+        .govuk-service-navigation__link { color: #fff; font-weight: 600; text-decoration: none; }
+        .govuk-service-navigation__link:hover { text-decoration: underline; }
+        details .govuk-details__summary-text { font-weight: 700; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="govuk-template__body govuk-frontend-supported">
+<script>document.body.className = document.body.className ? document.body.className + ' js-enabled' : 'js-enabled';</script>
+
+<div id="skiplink-container">
+    <div><a href="#main-content" class="govuk-skip-link">Skip to main content</a></div>
+</div>
+
+<header role="banner" class="govuk-header govuk-header--full-width-border" data-module="govuk-header">
+    <div class="govuk-header__container govuk-width-container">
+        <div class="govuk-header__logo">
+            <a href="https://www.gov.uk/" class="govuk-header__link govuk-header__link--homepage">
+                <span class="govuk-header__logotype">
+                    <span class="govuk-header__logotype-text">GOV.UK</span>
+                </span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<section aria-label="Service information" class="govuk-service-navigation" data-module="govuk-service-navigation">
+    <div class="govuk-width-container">
+        <div class="govuk-service-navigation__container">
+            <span class="govuk-service-navigation__service-name">
+                <a href="/home" class="govuk-service-navigation__link">Make a lasting power of attorney</a>
+            </span>
+            <nav class="govuk-service-navigation__navigation">
+                <ul class="govuk-service-navigation__list">
+                    {% if request.session.get('user') %}
+                        <li class="govuk-service-navigation__item"><a href="/dashboard" class="govuk-service-navigation__link">Your applications</a></li>
+                        <li class="govuk-service-navigation__item"><a href="/logout" class="govuk-service-navigation__link">Sign out</a></li>
+                    {% else %}
+                        <li class="govuk-service-navigation__item"><a href="/login" class="govuk-service-navigation__link">Sign in</a></li>
+                        <li class="govuk-service-navigation__item"><a href="/register" class="govuk-service-navigation__link">Create account</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<main class="govuk-width-container" id="main-content" role="main">
+    {% block main %}{% endblock %}
+    <p class="govuk-body"><a class="govuk-link" href="/send-feedback">Your feedback</a> will help us to improve.</p>
+</main>
+
+<footer class="govuk-footer" role="contentinfo">
+    <div class="govuk-width-container">
+        <div class="govuk-footer__meta">
+            <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                <h2 class="govuk-visually-hidden">Support links</h2>
+                <ul class="govuk-footer__inline-list">
+                    <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/contact">Contact us</a></li>
+                    <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/accessibility" rel="noreferrer noopener" target="_blank">Accessibility statement<span class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+                    <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/terms" rel="noreferrer noopener" target="_blank">Terms of use<span class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+                    <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/privacy-notice" rel="noreferrer noopener" target="_blank">Privacy notice<span class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+                    <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/cookies" rel="noreferrer noopener" target="_blank">Cookies<span class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+                    <li class="govuk-footer__inline-list-item">Built by <a class="govuk-footer__link" href="https://www.gov.uk/government/organisations/office-of-the-public-guardian" rel="noreferrer noopener" target="_blank">OPG Digital<span class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
+                </ul>
+                <span class="govuk-footer__licence-description">
+                    All content is available under the <a class="govuk-footer__link" href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" rel="license">Open Government Licence v3.0</a>, except where otherwise stated
+                </span>
+            </div>
+            <div class="govuk-footer__meta-item">
+                <a class="govuk-footer__link govuk-footer__copyright-logo" href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">© Crown copyright</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', path='v2/js/libs/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', path='v2/js/govuk-frontend.min.js') }}"></script>
+<script>window.GOVUKFrontend.initAll();</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

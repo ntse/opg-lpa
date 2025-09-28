@@ -8,12 +8,15 @@
     "test": "tests"
   },
   "scripts": {
-    "lint:check": "eslint service-front/assets/js cypress/e2e/common"
+    "lint:check": "eslint service-front/assets/js cypress/e2e/common",
+    "test:playwright": "playwright test"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.28.4",
     "@badeball/cypress-cucumber-preprocessor": "^22.0.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
+    "@cypress/snapshot": "^2.1.7",
+    "@playwright/test": "^1.49.1",
     "axe-core": "^4.1.4",
     "cli-table": "^0.3.9",
     "cypress": "14.5.4",

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block main %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">{{ title }}</h1>
+            <p class="govuk-body">Browse guidance about making and using a lasting power of attorney.</p>
+            {% for category, pages in categories %}
+                <section class="govuk-!-margin-top-6">
+                    <h2 class="govuk-heading-m">{{ category }}</h2>
+                    <ul class="govuk-list govuk-list--bullet">
+                        {% for page in pages %}
+                            <li><a class="govuk-link" href="/guide/{{ page.slug }}">{{ page.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

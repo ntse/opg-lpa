@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block main %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">{{ title }}</h1>
+            <form method="post" novalidate>
+                <div class="govuk-form-group{% if errors.get('name') %} govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="name">Name (optional)</label>
+                    {% if errors.get('name') %}<p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors['name'] }}</p>{% endif %}
+                    <input class="govuk-input" id="name" name="name" type="text" value="{{ form.get('name', '') }}">
+                </div>
+
+                <div class="govuk-form-group{% if errors.get('email') %} govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="email">Email address (optional)</label>
+                    {% if errors.get('email') %}<p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors['email'] }}</p>{% endif %}
+                    <input class="govuk-input" id="email" name="email" type="email" value="{{ form.get('email', '') }}">
+                </div>
+
+                <div class="govuk-form-group{% if errors.get('message') %} govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="message">How can we improve this service?</label>
+                    {% if errors.get('message') %}<p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> {{ errors['message'] }}</p>{% endif %}
+                    <textarea class="govuk-textarea" id="message" name="message" rows="5">{{ form.get('message', '') }}</textarea>
+                </div>
+
+                <div class="govuk-form-group">
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="consent" name="consent" type="checkbox" value="true" {% if form.get('consent') %}checked{% endif %}>
+                            <label class="govuk-label govuk-checkboxes__label" for="consent">
+                                I'm happy for you to contact me about my feedback
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="govuk-button" data-module="govuk-button" type="submit">Send feedback</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

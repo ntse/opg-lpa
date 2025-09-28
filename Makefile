@@ -19,9 +19,19 @@ COMPOSER_VERSION := "2.8.11"
 # Unique identifier for this version of the application
 APP_VERSION := $(shell echo -n `git rev-parse --short HEAD`)
 
-.PHONY: all
-all:
-	@${MAKE} dc-up
+# FastAPI stack helpers
+.PHONY: all fastapi-up fastapi-down fastapi-logs
+
+all: fastapi-up
+
+fastapi-up:
+	docker compose -f docker-compose.fastapi.yml up --build
+
+fastapi-down:
+	docker compose -f docker-compose.fastapi.yml down
+
+fastapi-logs:
+	docker compose -f docker-compose.fastapi.yml logs -f
 
 .PHONY: reset
 reset:

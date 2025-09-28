@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block main %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <nav class="govuk-breadcrumbs govuk-!-margin-bottom-3" aria-label="Breadcrumb">
+                <ol class="govuk-breadcrumbs__list">
+                    <li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="/guide">Guidance</a></li>
+                    <li class="govuk-breadcrumbs__list-item">{{ page.category }}</li>
+                </ol>
+            </nav>
+            <h1 class="govuk-heading-l">{{ page.title }}</h1>
+            <div class="govuk-body" id="guidance-content">{{ page.body_html | safe }}</div>
+        </div>
+    </div>
+{% endblock %}
